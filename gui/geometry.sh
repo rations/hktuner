@@ -20,8 +20,9 @@ SCREEN_H=196
 
 # Side LED bar stacks: N_LED_ROWS cells per side, drawn bottom-up.
 # Sprites are padded for glow; LED_W/LED_H is the padded sprite size and
-# LED_CORE_W/H the lit cell inside it (centered).
-N_LED_ROWS=8
+# LED_CORE_W/H the lit cell inside it (centered). 7 rows: an 8th row
+# (y = 319..339) lands on the bezel corner rounding, outside the glass.
+N_LED_ROWS=7
 LED_W=48
 LED_H=20
 LED_CORE_W=40
