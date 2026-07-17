@@ -12,6 +12,15 @@
 WIN_W=768
 WIN_H=512
 
+# Shipped view: the canvas around the device is transparent (device opaque
+# bbox is 593x197+90+148 in the 768x512 frame), so the UI crops to the
+# device plus a black outline margin, with the reference-entry strip on the
+# black below it. The UI draws background/sprites shifted by -CROP_X/-CROP_Y.
+CROP_X=74
+CROP_Y=132
+VIEW_W=626
+VIEW_H=268
+
 # Glass interior (safe drawing area inside the bezel).
 SCREEN_X=90
 SCREEN_Y=153

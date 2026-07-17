@@ -43,4 +43,23 @@ magick -size "${M_W}x${M_H}" "xc:${PHOSPHOR_CORE}" \
 magick "$tmp/markbloom.png" "$tmp/markcore.png" -compose over -composite \
     -resize 50% -depth 8 PNG32:dot_marker.png
 
-identify dot_off.png dot_on.png dot_marker.png
+# In-tune marker: the same lozenge in green, shown when the reading is
+# within the in-tune window and the marker sits over the center dot. The
+# core is the saturated LED green (a pale core reads as white at this size)
+# with a soft brighter center screened on top.
+magick -size "${M_W}x${M_H}" xc:black -fill '#b0ffb0' \
+    -draw "ellipse $((M_W / 2)),$((M_H / 2)) 4,$((M_H / 4)) 0,360" \
+    -blur 0x5 "$tmp/markhot_g.png"
+# Screen on an opaque canvas FIRST, then cut the mask alpha — screening an
+# opaque layer onto an alpha'd one turns the whole sprite opaque.
+magick -size "${M_W}x${M_H}" "xc:${LED_GREEN}" "$tmp/markhot_g.png" \
+    -compose screen -composite \
+    "$tmp/markmask.png" -alpha off -compose CopyOpacity -composite \
+    "$tmp/marklit_g.png"
+magick -size "${M_W}x${M_H}" "xc:${LED_GREEN}" \
+    \( "$tmp/markmask.png" -blur 0x7 \) -alpha off -compose CopyOpacity -composite \
+    -channel A -evaluate multiply 0.8 +channel "$tmp/markbloom_g.png"
+magick "$tmp/markbloom_g.png" "$tmp/marklit_g.png" -compose over -composite \
+    -resize 50% -depth 8 PNG32:dot_marker_green.png
+
+identify dot_off.png dot_on.png dot_marker.png dot_marker_green.png

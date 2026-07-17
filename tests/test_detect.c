@@ -157,9 +157,22 @@ int main(void)
         failures += !ok;
     }
 
-    /* Silence must gate to zero. */
+    /* Display hold: after a tone stops, the last reading is held for
+       ~HKT_HOLD_SEC before clearing (hardware-tuner behavior). The hard
+       cut to zero mid-window biases the final estimate by a few cents
+       (real decays fade instead), so only require the held reading to be
+       recognizably the same note. */
     {
-        const float got = run_tone(&h, 0.0, 0.0, 1.0);
+        run_tone(&h, 440.0, 0.5, 1.0);
+        const float held = run_tone(&h, 0.0, 0.0, 0.5);
+        const int ok = fabs(cents_off(held, 440.0)) <= 25.0;
+        printf("%s: hold after tone stop -> freq %.3f\n", ok ? "PASS" : "FAIL", (double)held);
+        failures += !ok;
+    }
+
+    /* Sustained silence (past the hold) must gate to zero. */
+    {
+        const float got = run_tone(&h, 0.0, 0.0, 2.0);
         const int ok = got == 0.0f && h.clarity == 0.0f;
         printf("%s: silence -> freq %.3f clarity %.3f\n", ok ? "PASS" : "FAIL", (double)got,
                (double)h.clarity);
@@ -167,11 +180,11 @@ int main(void)
     }
 
     /* Below the gate-on threshold the tuner must stay silent (mean abs of a
-       sine is 2/pi * amp; amp 0.001 -> ~0.00064 < 0.001). */
+       sine is 2/pi * amp; amp 0.0005 -> ~0.00032 < 0.0005). */
     {
-        const float got = run_tone(&h, 440.0, 0.001, 1.0);
+        const float got = run_tone(&h, 440.0, 0.0005, 1.0);
         const int ok = got == 0.0f;
-        printf("%s: sub-gate 440 Hz at amp 0.001 -> freq %.3f\n", ok ? "PASS" : "FAIL",
+        printf("%s: sub-gate 440 Hz at amp 0.0005 -> freq %.3f\n", ok ? "PASS" : "FAIL",
                (double)got);
         failures += !ok;
     }

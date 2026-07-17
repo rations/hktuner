@@ -28,16 +28,17 @@ magick "$tmp/mask.png" -blur 0x8 "$tmp/halo.png"
 
 make_lit() { # color outfile
     local color="$1" out="$2"
-    # Body: vertical gradient of the color, slightly darker at the bottom,
-    # clipped by the cell mask.
-    magick -size "${S_W}x${S_H}" "gradient:${color}-black" \
-        -level 0%,140% \
-        "$tmp/mask.png" -alpha off -compose CopyOpacity -composite "$tmp/body.png"
-    # Hot core: blurred white ellipse screened on top.
+    # Hot core: blurred white ellipse screened onto the gradient body.
     magick -size "${S_W}x${S_H}" xc:black -fill white \
         -draw "ellipse $((S_W / 2)),$((Y0 + C_H / 3)) $((C_W / 3)),$((C_H / 4)) 0,360" \
         -blur 0x6 "$tmp/hot.png"
-    magick "$tmp/body.png" \( "$tmp/hot.png" \) -compose screen -composite "$tmp/lit.png"
+    # Body: vertical gradient of the color, slightly darker at the bottom.
+    # Screen the hot core while still opaque, THEN cut the cell mask alpha —
+    # screening an opaque layer onto an alpha'd one turns the sprite opaque.
+    magick -size "${S_W}x${S_H}" "gradient:${color}-black" \
+        -level 0%,140% \
+        "$tmp/hot.png" -compose screen -composite \
+        "$tmp/mask.png" -alpha off -compose CopyOpacity -composite "$tmp/lit.png"
     # Bloom halo underneath, tinted with the LED color.
     magick -size "${S_W}x${S_H}" "xc:${color}" \
         "$tmp/halo.png" -alpha off -compose CopyOpacity -composite \

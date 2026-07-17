@@ -42,14 +42,18 @@
 /* Detection calibration. Window ~85 ms and ~10 estimates/s are standard
    tuner values; the gate hysteresis pair is in mean-absolute-sample terms.
    Results above 1 kHz are rejected: lag resolution (and musical need) drop
-   off there. */
+   off there. A decaying pluck loses fundamental energy (clarity) and level
+   long before it stops sounding, so the last good reading is held for
+   HKT_HOLD_SEC after detection drops out — the hardware-tuner behavior —
+   and only then does the display clear. */
 #define HKT_WINDOW_SEC 0.085
 #define HKT_HOP_SEC 0.1
+#define HKT_HOLD_SEC 1.0
 #define HKT_FREQ_MAX 1000.0f
 #define HKT_FREQ_MIN 40.0
-#define HKT_GATE_ON 0.001f
-#define HKT_GATE_OFF 0.0009f
-#define HKT_CLARITY_MIN 0.80f
+#define HKT_GATE_ON 0.0005f
+#define HKT_GATE_OFF 0.00045f
+#define HKT_CLARITY_MIN 0.60f
 #define HKT_PEAK_FACTOR 0.9f
 
 typedef enum {
@@ -97,7 +101,11 @@ typedef struct {
     int busy;       /* RT-thread-only flag                    */
     float cur_freq; /* latest published result (RT copies)    */
     float cur_clarity;
-    int gate_open; /* worker-only hysteresis state           */
+    int gate_open;      /* worker-only hysteresis state           */
+    uint32_t hold_hops; /* estimates the last reading is held for */
+    uint32_t hold_left; /* worker-only hold countdown             */
+    float held_freq;    /* worker-only last good reading          */
+    float held_clarity;
 } Hktuner;
 
 static uint32_t next_pow2(uint32_t v)
@@ -138,6 +146,7 @@ static LV2_Handle instantiate(const LV2_Descriptor *descriptor, double rate,
         t->tau_max = t->win / 2;
     }
     t->hop = (uint32_t)(rate * HKT_HOP_SEC);
+    t->hold_hops = (uint32_t)(HKT_HOLD_SEC / HKT_HOP_SEC + 0.5);
     if (t->tau_max < 16) {
         free(t);
         return NULL;
@@ -198,6 +207,9 @@ static void activate(LV2_Handle instance)
     t->cur_freq = 0.0f;
     t->cur_clarity = 0.0f;
     t->gate_open = 0;
+    t->hold_left = 0;
+    t->held_freq = 0.0f;
+    t->held_clarity = 0.0f;
 }
 
 static void run(LV2_Handle instance, uint32_t n_samples)
@@ -378,6 +390,18 @@ static LV2_Worker_Status work(LV2_Handle instance, LV2_Worker_Respond_Function r
                 res.clarity = clarity;
             }
         }
+    }
+
+    /* Display hold (worker-only state): keep the last good reading through
+       short detection dropouts, then clear. */
+    if (res.freq > 0.0f) {
+        t->held_freq = res.freq;
+        t->held_clarity = res.clarity;
+        t->hold_left = t->hold_hops;
+    } else if (t->hold_left > 0) {
+        t->hold_left--;
+        res.freq = t->held_freq;
+        res.clarity = t->held_clarity;
     }
 
     return respond(handle, sizeof(res), &res);

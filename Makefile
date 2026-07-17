@@ -28,14 +28,8 @@ TTLS := $(OUT)/manifest.ttl $(OUT)/hktuner.ttl
 all: build
 
 ifeq ($(UNAME),Haiku)
-ifneq ($(wildcard src/hktuner_ui.cpp),)
 # The native BView UI needs the Interface Kit (Haiku only).
 build: check-stage $(OUT)/hktuner.so $(OUT)/hktuner_ui.so $(TTLS) $(BUNDLE_PNGS)
-else
-# TODO: the UI translation unit does not exist yet; until it lands the bundle
-# ships DSP-only (hosts that try the declared UI will report a load failure).
-build: check-stage $(OUT)/hktuner.so $(TTLS) $(BUNDLE_PNGS)
-endif
 else
 build: check-stage $(OUT)/hktuner.so $(TTLS) $(BUNDLE_PNGS)
 endif
