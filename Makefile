@@ -68,6 +68,18 @@ $(OUT)/gui/%.png: gui/%.png
 	@mkdir -p $(OUT)/gui
 	cp $< $@
 
+# ---- tests -----------------------------------------------------------------
+
+# Offline detection test: links the plugin translation unit directly and
+# drives it through the LV2 descriptor API with a synchronous worker.
+$(BUILD_DIR)/test_detect: tests/test_detect.c src/hktuner.c
+	@mkdir -p $(BUILD_DIR)
+	$(CC) -std=c99 $(WARN) -O2 -o $@ tests/test_detect.c src/hktuner.c \
+		`$(PKGCFG) pkg-config --cflags lv2` -lm
+
+test: check-stage $(BUILD_DIR)/test_detect
+	$(BUILD_DIR)/test_detect
+
 # ---- install / validate ----------------------------------------------------
 
 install: build
