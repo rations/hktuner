@@ -1,0 +1,29 @@
+name			hktuner
+version			0.1.0-1
+architecture	x86_64
+summary			"hktuner - chromatic tuner LV2 plugin (native Haiku GUI)"
+description		"A chromatic tuner LV2 plugin for Haiku with a native Interface Kit
+GUI: an LED-matrix screen showing note name, octave, a cents strip and flat/sharp bars.
+Stereo pass-through - drop it anywhere in a chain and the audio is copied through
+untouched while pitch is detected on the L+R mix. Pitch detection is clean-room
+time-domain MPM/NSDF run off the audio thread via the LV2 worker extension. The A4
+reference defaults to 440 Hz and is settable from 380-500 Hz. Loads in any LV2 host;
+the GUI needs a host that supports the LV2-haiku HaikuUI UI type, such as JackDAW."
+packager		"rations <ehqcar@proton.me>"
+vendor			"rations"
+copyrights {
+	"2026 rations"
+}
+licenses {
+	"MIT"
+}
+provides {
+	hktuner = 0.1.0
+}
+requires {
+	haiku
+	lv2_haiku
+}
+urls {
+	"https://github.com/rations/hktuner"
+}
