@@ -14,7 +14,7 @@ PKGCFG := PKG_CONFIG_PATH=$(STAGE)/lib/pkgconfig
 
 BUILD_DIR ?= build
 OUT := $(BUILD_DIR)/hktuner.lv2
-LV2_INSTALL_DIR ?= $(HOME)/config/non-packaged/add-ons/lv2
+LV2_INSTALL_DIR ?= $(HOME)/config/non-packaged/add-ons/media/LV2
 
 CC ?= gcc
 CXX ?= g++

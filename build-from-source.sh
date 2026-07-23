@@ -18,4 +18,4 @@ pkgman install -y pkgconfig gcc make
 make
 make install
 
-echo "done: bundle in $HOME/config/non-packaged/add-ons/lv2/hktuner.lv2"
+echo "done: bundle in $HOME/config/non-packaged/add-ons/media/LV2/hktuner.lv2"

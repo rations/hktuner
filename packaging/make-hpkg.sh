@@ -1,7 +1,7 @@
 #!/bin/sh
 # make-hpkg.sh — build the `hktuner` .hpkg on a running Haiku (x86_64): the
 # plugin bundle (DSP .so, native HaikuUI .so, TTLs and the GUI sprite PNGs)
-# installed to /boot/system/add-ons/lv2/hktuner.lv2.
+# installed to /boot/system/add-ons/media/LV2/hktuner.lv2.
 #
 # Needs the sibling LV2-haiku checkout built first — the plugin compiles
 # against its staged lv2 headers (LV2_HAIKU, default $HOME/LV2-haiku), and the
@@ -10,7 +10,7 @@ set -e
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$HERE/.." && pwd)
-VERSION=0.1.0
+VERSION=0.3.0
 REVISION=1
 STAGE_PKG="$HERE/stage"
 
@@ -30,8 +30,8 @@ test -f build/hktuner.lv2/hktuner_ui.so || {
     exit 1
 }
 
-mkdir -p "$STAGE_PKG/add-ons/lv2"
-cp -r build/hktuner.lv2 "$STAGE_PKG/add-ons/lv2/"
+mkdir -p "$STAGE_PKG/add-ons/media/LV2"
+cp -r build/hktuner.lv2 "$STAGE_PKG/add-ons/media/LV2/"
 
 cp "$HERE/hktuner.PackageInfo" "$STAGE_PKG/.PackageInfo"
 OUT="$HERE/hktuner-$VERSION-$REVISION-x86_64.hpkg"

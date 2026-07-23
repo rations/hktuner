@@ -1,5 +1,5 @@
 name			hktuner
-version			0.1.0-1
+version			0.3.0-1
 architecture	x86_64
 summary			"hktuner - chromatic tuner LV2 plugin (native Haiku GUI)"
 description		"A chromatic tuner LV2 plugin for Haiku with a native Interface Kit
@@ -18,7 +18,7 @@ licenses {
 	"MIT"
 }
 provides {
-	hktuner = 0.1.0
+	hktuner = 0.3.0
 }
 requires {
 	haiku

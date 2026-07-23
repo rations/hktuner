@@ -38,7 +38,7 @@ Requires a built [LV2-haiku](https://github.com/rations/LV2-haiku) checkout next
 
 ```sh
 make                 # builds build/hktuner.lv2 (DSP; plus the BView UI on Haiku)
-make install         # copies the bundle to ~/config/non-packaged/add-ons/lv2/
+make install         # copies the bundle to ~/config/non-packaged/add-ons/media/LV2/
 make validate        # lv2ls / lv2info against the LV2-haiku stage
 LV2_HAIKU=/path/to/LV2-haiku make   # if the checkout is not at ~/LV2-haiku
 ```
